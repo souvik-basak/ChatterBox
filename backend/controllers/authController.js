@@ -18,6 +18,7 @@ export const signup = async (req, res) => {
         .status(400)
         .json({ status: false, message: "Username already taken" });
     }
+
     const userEmail = await User.findOne({ email });
     if (userEmail) {
       return res
@@ -60,25 +61,25 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const { userName, password } = req.body;
+    const user = await User.findOne({ userName });
     const isPasswordMatch = await bcrypt.compare(
       password,
       user?.password || ""
     );
 
-    if (user && isPasswordMatch) {
-      await generateTokenAndSetCookie(user._id, res);
-      res.status(200).json({
-        _id: user._id,
-        fullName: user.fullName,
-        userName: user.userName,
-        email: user.email,
-        profilePic: user.profilePic,
-      });
-    } else {
-      res.status(400).json({ status: false, message: "Invalid credentials" });
+    if (!user || !isPasswordMatch) {
+      return res.status(400).json({ error: "Invalid username or password" });
     }
+
+    generateTokenAndSetCookie(user._id, res);
+
+    res.status(200).json({
+      _id: user._id,
+      fullName: user.fullName,
+      userName: user.userName,
+      profilePic: user.profilePic,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ status: false, error: error.message });

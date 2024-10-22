@@ -5,9 +5,9 @@ import authRoute from "./routes/authRoutes.js";
 import messageRoute from "./routes/messageRoutes.js";
 import userRoute from "./routes/userRoutes.js";
 import connectToDB from "./db/connectToDB.js";
-
+import { app, server } from "./socket/socket.js";
 dotenv.config();
-const app = express();
+
 const PORT = process.env.BACKEND_PORT;
 
 // to use the middleware
@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
 });
 
 // to listen to the server and get connected to the database
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   connectToDB();
   console.log(`server running on port ${PORT}`);
 });
